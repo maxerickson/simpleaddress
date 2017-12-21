@@ -1,5 +1,8 @@
 import simpleaddress
 
+# patch in a data specific value
+simpleaddress.replacemap["no."]="N"
+
 def parts(address):
     number, street=address.split(" ",1)
     unit=""
@@ -13,7 +16,8 @@ def parts(address):
 addresses="""3-3300 Kuhio Hwy
 11400 Highway 99
 2909 Austell Rd Sw Suite 100
-1334 Flammang Dr""".splitlines()
+1334 Flammang Dr
+1335 No. Flamingo Ln.""".splitlines()
 
 for address in addresses:
 	normal=simpleaddress.normalize(address)
