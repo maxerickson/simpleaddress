@@ -1,4 +1,4 @@
-import simpleaddress
+from simpleaddress import simpleaddress
 
 # patch in a data specific value
 simpleaddress.replacemap["no."]="N"

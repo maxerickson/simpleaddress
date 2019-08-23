@@ -1,6 +1,19 @@
-"""
-Compare addresses by shortening them on word boundaries.
-"""
+# Copyright 2017 Max Erickson
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+    # http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+__location__=os.path.dirname(os.path.realpath(__file__))
 
 directions={
 "North":"N",
@@ -31,6 +44,7 @@ street_suffixes={
 "Plaza":"Plz",
 "Road":"Rd",
 "Route":"Rt",
+"Saint":"St",
 "Square":"Sq",
 "Street":"St",
 "Suite":"Ste",
@@ -38,9 +52,22 @@ street_suffixes={
 "Trail":"Trl"
 }
 
-saints=["Agnes","Ann","Anne","Charles","Clair","Elizabeth",
-            "Francis","George","Mark","Mary"]
+saints=open(os.path.join(__location__,"saints")).read().splitlines(False)
 saints=set(saints)
+
+abpairs=open(os.path.join(__location__,"abbreviations")).read().splitlines(False)
+expansions=dict()
+words=list()
+for line in abpairs:
+    ab,word = line.split(",")
+    if ab in expansions:
+        print(ab,word)
+    expansions[ab]=word
+    words.append(word)
+wm=dict()
+for ab,word in expansions.items():
+    if words.count(word)==1:
+        wm[word]=ab
 
 wordmap=dict()
 wordmap.update(directions)
@@ -69,6 +96,9 @@ def normalize(address):
                     parts[i]=part.replace(s,s.lower())
     return " ".join(parts)
 
+"""
+Compare addresses by shortening them on word boundaries.
+"""
 def compare(addr1,addr2):
     return normalize(addr1)==normalize(addr2)
 
@@ -78,9 +108,12 @@ def expand_saint(parts):
         i=parts.index(s)
         if i > 0 and parts[i-1].lower() in {"st.","st"}:
             parts[i-1]="Saint"
+        if i > 0 and parts[i-1].lower() in {"ste","ste."}:
+            parts[i-1]="Sainte"
     return parts
 
-revmap=dict((v,k) for k,v in street_suffixes.items())
+#~ revmap=dict((v,k) for k,v in street_suffixes.items())
+revmap=expansions
 for k,v in directions.items():
     revmap[v]=k
 def expand_streetname(name):
